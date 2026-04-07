@@ -63,15 +63,15 @@ function App() {
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/miners" element={<AdminMiners />} />
           <Route path="/admin/logs" element={<RequireLevel maxLevel={1}><AdminLogs /></RequireLevel>} />
-          <Route path="/admin/metrics" element={<RequireLevel maxLevel={1}><AdminMetrics /></RequireLevel>} />
+          <Route path="/admin/metrics" element={<AdminMetrics />} />
           <Route path="/admin/offer-events" element={<AdminOfferEvents />} />
           <Route path="/admin/offer-events/:id" element={<AdminOfferEventManage />} />
           <Route path="/admin/support" element={<AdminSupport />} />
           <Route path="/admin/deposit-tickets" element={<AdminDepositTickets />} />
           <Route path="/admin/banners" element={<AdminBanners />} />
           <Route path="/admin/creators" element={<AdminCreators />} />
-          <Route path="/admin/transparency" element={<RequireLevel maxLevel={1}><AdminTransparency /></RequireLevel>} />
-          <Route path="/admin/analytics" element={<RequireLevel maxLevel={1}><AdminAnalytics /></RequireLevel>} />
+          <Route path="/admin/transparency" element={<AdminTransparency />} />
+          <Route path="/admin/analytics" element={<AdminAnalytics />} />
           <Route path="/admin/broadcast" element={<AdminBroadcast />} />
         </Route>
 

@@ -29,9 +29,9 @@ const adminMenuItems = [
   { icon: Youtube, label: 'Criadores', path: '/admin/creators', minLevel: 2 },
   { icon: Ticket, label: 'Dep. Tickets', path: '/admin/deposit-tickets', minLevel: 2 },
   { icon: Bell, label: 'Notificacoes', path: '/admin/broadcast', minLevel: 2 },
-  { icon: Eye, label: 'Transparência', path: '/admin/transparency', minLevel: 1 },
-  { icon: Activity, label: 'Métricas', path: '/admin/metrics', minLevel: 1 },
-  { icon: TrendingUp, label: 'Analytics', path: '/admin/analytics', minLevel: 1 },
+  { icon: Eye, label: 'Transparência', path: '/admin/transparency', minLevel: 2 },
+  { icon: Activity, label: 'Métricas', path: '/admin/metrics', minLevel: 2 },
+  { icon: TrendingUp, label: 'Analytics', path: '/admin/analytics', minLevel: 2 },
   { icon: FileText, label: 'Logs', path: '/admin/logs', minLevel: 1 },
 ];
 
