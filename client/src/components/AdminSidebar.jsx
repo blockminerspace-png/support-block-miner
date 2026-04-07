@@ -14,7 +14,8 @@ import {
     Youtube,
     Eye,
     TrendingUp,
-    Bell
+    Bell,
+    X
 } from 'lucide-react';
 import { useAdminCtx } from './AdminLayout';
 
@@ -35,7 +36,7 @@ const adminMenuItems = [
   { icon: FileText, label: 'Logs', path: '/admin/logs', minLevel: 1 },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ onClose }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { adminLevel } = useAdminCtx();
@@ -47,15 +48,21 @@ export default function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-slate-900 border-r border-slate-800 p-6 shrink-0 flex flex-col h-full shadow-2xl relative z-20">
-      <div className="flex items-center gap-3 mb-10 px-2">
-        <div className="w-10 h-10 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-          <ShieldAlert className="text-white w-6 h-6" />
+    <aside className="w-64 bg-slate-900 border-r border-slate-800 p-4 lg:p-6 shrink-0 flex flex-col h-full shadow-2xl relative z-20">
+      <div className="flex items-center gap-3 mb-8 lg:mb-10 px-2">
+        <div className="w-9 h-9 lg:w-10 lg:h-10 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
+          <ShieldAlert className="text-white w-5 h-5 lg:w-6 lg:h-6" />
         </div>
-        <span className="font-black text-xl tracking-tighter text-white uppercase">Admin<span className="text-amber-500">Panel</span></span>
+        <span className="font-black text-lg lg:text-xl tracking-tighter text-white uppercase">Admin<span className="text-amber-500">Panel</span></span>
+        {/* Botão fechar mobile */}
+        {onClose && (
+          <button onClick={onClose} className="ml-auto lg:hidden p-1 text-slate-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
-      <nav className="space-y-1 flex-1">
+      <nav className="space-y-1 flex-1 overflow-y-auto">
         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-2 mb-4">Gestão do Sistema</p>
         {visibleItems.map((item) => {
           const isActive =
@@ -65,14 +72,14 @@ export default function AdminSidebar() {
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${
+              className={`w-full flex items-center gap-3 px-4 py-2.5 lg:py-3 rounded-xl transition-all duration-300 group ${
                 isActive 
                   ? 'bg-amber-500/10 text-amber-500 shadow-sm' 
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
               }`}
             >
-              <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-amber-500' : 'group-hover:text-white'}`} />
-              <span className="font-semibold text-sm">{item.label}</span>
+              <item.icon className={`w-4 h-4 lg:w-5 lg:h-5 shrink-0 transition-colors ${isActive ? 'text-amber-500' : 'group-hover:text-white'}`} />
+              <span className="font-semibold text-sm truncate">{item.label}</span>
             </button>
           );
         })}
