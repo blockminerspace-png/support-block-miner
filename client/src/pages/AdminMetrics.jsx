@@ -133,22 +133,36 @@ export default function AdminMetrics() {
 
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
                 <h3 className="text-lg font-bold text-white mb-6">Informações do Sistema</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     <InfoItem label="Plataforma" value={metrics.platform} />
-                    <InfoItem label="Node.js Version" value={metrics.nodeVersion} />
-                    <InfoItem label="Total RAM" value={formatBytes(metrics.memoryTotalBytes)} />
-                    <InfoItem label="Total Disk" value={formatBytes(metrics.diskTotalBytes)} />
+                    <InfoItem label="Node.js" value={metrics.nodeVersion} />
+                    <InfoItem label="PID" value={`#${metrics.processId}`} />
+                    <InfoItem label="Uptime processo" value={formatUptime(metrics.uptimeSeconds || 0)} />
+                    <InfoItem label="RAM total" value={formatBytes(metrics.memoryTotalBytes)} />
+                    <InfoItem label="RAM usada" value={formatBytes(metrics.memoryUsedBytes)} color="purple" />
+                    <InfoItem label="RAM livre" value={formatBytes(metrics.memoryFreeBytes)} color="emerald" />
+                    <InfoItem label="Disco total" value={formatBytes(metrics.diskTotalBytes)} />
+                    <InfoItem label="Disco usado" value={formatBytes(metrics.diskUsedBytes)} color="amber" />
+                    <InfoItem label="Disco livre" value={formatBytes((metrics.diskTotalBytes || 0) - (metrics.diskUsedBytes || 0))} color="emerald" />
+                    <InfoItem label="CPUs" value={`${metrics.cpuCores || '?'} cores`} />
+                    <InfoItem label="Carga CPU" value={`${(metrics.cpuUsagePercent || 0).toFixed(2)}%`} color={metrics.cpuUsagePercent > 80 ? 'red' : metrics.cpuUsagePercent > 50 ? 'amber' : 'emerald'} />
                 </div>
             </div>
         </div>
     );
 }
 
-function InfoItem({ label, value }) {
+function InfoItem({ label, value, color }) {
+    const colorMap = {
+        emerald: 'text-emerald-400',
+        purple: 'text-purple-400',
+        amber: 'text-amber-400',
+        red: 'text-red-400',
+    };
     return (
-        <div className="border-b border-slate-800 pb-3">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{label}</p>
-            <p className="text-sm font-mono text-slate-300">{value || 'N/A'}</p>
+        <div className="bg-slate-800/40 rounded-2xl p-4 border border-slate-700/40">
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5">{label}</p>
+            <p className={`text-sm font-mono font-bold ${colorMap[color] || 'text-slate-200'}`}>{value || 'N/A'}</p>
         </div>
     );
 }

@@ -398,25 +398,48 @@ adminRouter.get("/audit", async (req, res) => {
 // Server Metrics
 adminRouter.get("/server-metrics", async (req, res) => {
     try {
-        // Simple mock of metrics since full OS logic might require `adminController.collectServerMetrics`
-        // Wait, getStats already returns metrics, let's just reuse adminController's logic or call it here
         const os = await import("os");
+        const { execSync } = await import("child_process");
+
+        // CPU real: mede diferença em 200ms
+        const cpuBefore = os.cpus().map(c => ({ ...c.times }));
+        await new Promise(r => setTimeout(r, 200));
+        const cpuAfter = os.cpus();
+        let totalIdle = 0, totalTick = 0;
+        for (let i = 0; i < cpuAfter.length; i++) {
+            const b = cpuBefore[i];
+            const a = cpuAfter[i].times;
+            for (const t in a) totalTick += a[t] - (b[t] || 0);
+            totalIdle += a.idle - (b.idle || 0);
+        }
+        const cpuUsagePercent = totalTick > 0 ? (1 - totalIdle / totalTick) * 100 : 0;
+
+        // Disco real: df -B1 /
+        let diskTotalBytes = 0, diskUsedBytes = 0, diskUsagePercent = 0;
+        try {
+            const dfOut = execSync("df -B1 / 2>/dev/null | tail -1").toString().trim();
+            const parts = dfOut.split(/\s+/);
+            diskTotalBytes = parseInt(parts[1]) || 0;
+            diskUsedBytes  = parseInt(parts[2]) || 0;
+            diskUsagePercent = diskTotalBytes > 0 ? (diskUsedBytes / diskTotalBytes) * 100 : 0;
+        } catch { /* fallback: fica 0 */ }
+
         res.json({
             ok: true,
             metrics: {
-                cpuUsagePercent: Math.random() * 10, // Mocked for speed if not implemented fully
+                cpuUsagePercent,
+                cpuCores: os.cpus().length,
                 memoryTotalBytes: os.totalmem(),
                 memoryFreeBytes: os.freemem(),
                 memoryUsedBytes: os.totalmem() - os.freemem(),
                 memoryUsagePercent: (1 - os.freemem() / os.totalmem()) * 100,
                 uptimeSeconds: process.uptime(),
-                platform: process.platform,
-                cpuCores: os.cpus().length,
+                platform: os.platform(),
                 processId: process.pid,
                 nodeVersion: process.version,
-                diskTotalBytes: 500 * 1024 * 1024 * 1024, // Mock
-                diskUsedBytes: 50 * 1024 * 1024 * 1024,   // Mock
-                diskUsagePercent: 10
+                diskTotalBytes,
+                diskUsedBytes,
+                diskUsagePercent
             }
         });
     } catch (error) {
