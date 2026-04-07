@@ -4,6 +4,22 @@ import './index.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 
+// Patch DOM para tolerar modificações de extensões de tradução (Google Translate, Edge Translator)
+// Sem este patch, o React lança "removeChild: node is not a child" quando o translator
+// envolve text nodes em <font> tags, deslocando-os do parent esperado.
+;(function patchTranslationCompat() {
+  const _removeChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function(child) {
+    if (child.parentNode !== this) return child;
+    return _removeChild.apply(this, arguments);
+  };
+  const _insertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function(newNode, refNode) {
+    if (refNode && refNode.parentNode !== this) return newNode;
+    return _insertBefore.apply(this, arguments);
+  };
+})()
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
