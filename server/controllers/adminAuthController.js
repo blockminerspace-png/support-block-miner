@@ -90,11 +90,10 @@ export async function login(req, res) {
     const userEmail = userEmailRaw.toLowerCase();
     const userCode = rawCode;
 
-    if (!validateAdminCredentials(userEmail, userCode)) {
+    const adminUser = findAdminUser(userEmail, userCode);
+    if (!adminUser) {
       return res.status(401).json({ ok: false, message: "Invalid credentials" });
     }
-
-    const adminUser = findAdminUser(userEmail, userCode);
     const adminLevel = typeof adminUser?.level === 'number' ? adminUser.level : 2;
 
     const token = jwt.sign({ role: "admin", type: "admin_session", level: adminLevel, email: userEmail }, JWT_SECRET, {
