@@ -19,6 +19,7 @@ import {
   TrendingDown, TrendingUp, Upload, ImageIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { api } from '../store/auth';
 
 // ─── Static data ─────────────────────────────────────────────────────────────
 
@@ -93,18 +94,13 @@ export default function AdminTransparency() {
   const [uploading, setUploading]       = useState(false);
   const fileInputRef                    = useRef(null);
 
-  const adminToken = localStorage.getItem('adminToken');
-  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` };
-
   // ── Data fetching ──────────────────────────────────────────────────────────
 
   async function load() {
     setLoading(true);
     try {
-      const r = await fetch('/api/admin/transparency', { headers });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const d = await r.json();
-      if (d.ok) setEntries(d.entries);
+      const r = await api.get('/admin/transparency');
+      if (r.data.ok) setEntries(r.data.entries);
     } catch {
       toast.error(t('transparency.admin.toast_error'));
     } finally {
@@ -161,18 +157,12 @@ export default function AdminTransparency() {
     try {
       const fd = new FormData();
       fd.append('image', file);
-      const r = await fetch('/api/admin/upload-image', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${adminToken}` },
-        body: fd,
-      });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const d = await r.json();
-      if (d.ok && d.url) {
-        setForm(f => ({ ...f, imageUrl: d.url }));
+      const r = await api.post('/admin/upload-image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      if (r.data.ok && r.data.url) {
+        setForm(f => ({ ...f, imageUrl: r.data.url }));
         toast.success(t('transparency.admin.toast_image_uploaded'));
       } else {
-        toast.error(d.message || t('transparency.admin.toast_image_error'));
+        toast.error(r.data.message || t('transparency.admin.toast_image_error'));
       }
     } catch {
       toast.error(t('transparency.admin.toast_image_error'));
@@ -188,20 +178,15 @@ export default function AdminTransparency() {
     if (!form.amountUsd || isNaN(parseFloat(form.amountUsd))) return toast.error(t('transparency.admin.toast_invalid_amount'));
     setSaving(true);
     try {
-      const url    = editId ? `/api/admin/transparency/${editId}` : '/api/admin/transparency';
-      const method = editId ? 'PUT' : 'POST';
-      const r = await fetch(url, {
-        method,
-        headers,
-        body: JSON.stringify({ ...form, amountUsd: parseFloat(form.amountUsd) }),
-      });
-      const d = await r.json();
-      if (d.ok) {
+      const r = editId
+        ? await api.put(`/admin/transparency/${editId}`, { ...form, amountUsd: parseFloat(form.amountUsd) })
+        : await api.post('/admin/transparency', { ...form, amountUsd: parseFloat(form.amountUsd) });
+      if (r.data.ok) {
         toast.success(editId ? t('transparency.admin.toast_updated') : t('transparency.admin.toast_created'));
         setShowForm(false);
         load();
       } else {
-        toast.error(d.message || t('transparency.admin.toast_error'));
+        toast.error(r.data.message || t('transparency.admin.toast_error'));
       }
     } catch {
       toast.error(t('transparency.admin.toast_error'));
@@ -212,14 +197,9 @@ export default function AdminTransparency() {
 
   async function handleToggleActive(entry) {
     try {
-      const r = await fetch(`/api/admin/transparency/${entry.id}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({ isActive: !entry.isActive }),
-      });
-      const d = await r.json();
-      if (d.ok) load();
-      else toast.error(d.message || t('transparency.admin.toast_error'));
+      const r = await api.put(`/admin/transparency/${entry.id}`, { isActive: !entry.isActive });
+      if (r.data.ok) load();
+      else toast.error(r.data.message || t('transparency.admin.toast_error'));
     } catch {
       toast.error(t('transparency.admin.toast_error'));
     }
@@ -227,14 +207,13 @@ export default function AdminTransparency() {
 
   async function handleDelete(id) {
     try {
-      const r = await fetch(`/api/admin/transparency/${id}`, { method: 'DELETE', headers });
-      const d = await r.json();
-      if (d.ok) {
+      const r = await api.delete(`/admin/transparency/${id}`);
+      if (r.data.ok) {
         toast.success(t('transparency.admin.toast_deleted'));
         setConfirmDelete(null);
         load();
       } else {
-        toast.error(d.message || t('transparency.admin.toast_error'));
+        toast.error(r.data.message || t('transparency.admin.toast_error'));
       }
     } catch {
       toast.error(t('transparency.admin.toast_error'));

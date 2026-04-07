@@ -110,6 +110,17 @@ export async function login(req, res) {
   }
 }
 
+export function logout(req, res) {
+  try {
+    const cookieParts = [`${ADMIN_SESSION_COOKIE}=`, "Path=/", "HttpOnly", "SameSite=Strict", "Max-Age=0"];
+    res.setHeader("Set-Cookie", cookieParts.join("; "));
+    return res.json({ ok: true });
+  } catch (error) {
+    logger.error("Admin logout error", { error: error.message });
+    return res.status(500).json({ ok: false, message: "Internal server error" });
+  }
+}
+
 export async function check(req, res) {
   try {
     if (!JWT_SECRET) {

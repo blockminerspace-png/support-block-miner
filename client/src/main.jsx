@@ -20,15 +20,6 @@ import ErrorBoundary from './components/ErrorBoundary.jsx'
   };
 })()
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </StrictMode>,
-)
-
-
 // Stale CDN/browser cache: old index references missing chunks → reload once.
 window.addEventListener(
   'error',

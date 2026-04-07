@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { 
     Users, 
@@ -19,6 +20,7 @@ export default function AdminDashboard() {
     const [users, setUsers] = useState([]);
     const [auditLogs, setAuditLogs] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
     const fetchData = useCallback(async () => {
         try {
@@ -85,24 +87,24 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <HealthCard 
                     label="CPU" 
-                    value={`${stats?.serverCpuUsagePercent?.toFixed(1)}%`} 
-                    sub={`${stats?.serverCpuCores} cores`}
+                    value={`${(stats?.serverCpuUsagePercent ?? 0).toFixed(1)}%`} 
+                    sub={`${stats?.serverCpuCores ?? '?'} cores`}
                     icon={Server} 
-                    progress={stats?.serverCpuUsagePercent}
+                    progress={stats?.serverCpuUsagePercent ?? 0}
                 />
                 <HealthCard 
                     label="Memória RAM" 
-                    value={`${(stats?.serverMemoryUsedBytes / 1024**3).toFixed(1)}GB`} 
-                    sub={`de ${(stats?.serverMemoryTotalBytes / 1024**3).toFixed(1)}GB`}
+                    value={stats?.serverMemoryUsedBytes ? `${(stats.serverMemoryUsedBytes / 1024**3).toFixed(1)}GB` : '--'} 
+                    sub={stats?.serverMemoryTotalBytes ? `de ${(stats.serverMemoryTotalBytes / 1024**3).toFixed(1)}GB` : '--'}
                     icon={MemoryStick} 
-                    progress={stats?.serverMemoryUsagePercent}
+                    progress={stats?.serverMemoryUsagePercent ?? 0}
                 />
                 <HealthCard 
                     label="Armazenamento" 
-                    value={`${(stats?.serverDiskUsedBytes / 1024**3).toFixed(1)}GB`} 
-                    sub={`de ${(stats?.serverDiskTotalBytes / 1024**3).toFixed(1)}GB`}
+                    value={stats?.serverDiskUsedBytes ? `${(stats.serverDiskUsedBytes / 1024**3).toFixed(1)}GB` : '--'} 
+                    sub={stats?.serverDiskTotalBytes ? `de ${(stats.serverDiskTotalBytes / 1024**3).toFixed(1)}GB` : '--'}
                     icon={HardDrive} 
-                    progress={stats?.serverDiskUsagePercent}
+                    progress={stats?.serverDiskUsagePercent ?? 0}
                 />
             </div>
 
@@ -113,7 +115,7 @@ export default function AdminDashboard() {
                         <h2 className="text-lg font-bold text-white flex items-center gap-3">
                             <Users className="w-5 h-5 text-blue-500" /> Usuários Recentes
                         </h2>
-                        <button className="text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1">
+                        <button onClick={() => navigate('/admin/users')} className="text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1">
                             Ver Todos <ChevronRight className="w-3 h-3" />
                         </button>
                     </div>
@@ -127,7 +129,9 @@ export default function AdminDashboard() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800 font-medium">
-                                {users.map((u) => (
+                                {users.length === 0 && !isLoading ? (
+                                    <tr><td colSpan="3" className="px-8 py-10 text-center text-slate-600 text-xs font-bold uppercase tracking-widest">Nenhum usuário encontrado</td></tr>
+                                ) : users.map((u) => (
                                     <tr key={u.id} className="hover:bg-slate-800/30 transition-colors group">
                                         <td className="px-8 py-5">
                                             <div className="flex flex-col">
@@ -179,7 +183,9 @@ export default function AdminDashboard() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800 font-medium">
-                            {auditLogs.map((log, i) => (
+                            {auditLogs.length === 0 && !isLoading ? (
+                                <tr><td colSpan="4" className="px-8 py-10 text-center text-slate-600 text-xs font-bold uppercase tracking-widest">Nenhum evento registrado</td></tr>
+                            ) : auditLogs.map((log, i) => (
                                 <tr key={i} className="hover:bg-slate-800/30 transition-colors">
                                     <td className="px-8 py-4 text-xs font-bold text-slate-300">{log.action}</td>
                                     <td className="px-8 py-4 text-xs text-slate-500">{log.user_email || `User #${log.user_id}`}</td>

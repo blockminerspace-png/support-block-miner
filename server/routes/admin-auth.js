@@ -1,6 +1,6 @@
 import express from "express";
 import { createRateLimiter } from "../middleware/rateLimit.js";
-import { login, check } from "../controllers/adminAuthController.js";
+import { login, check, logout } from "../controllers/adminAuthController.js";
 
 export const adminAuthRouter = express.Router();
 
@@ -13,6 +13,9 @@ const loginLimiter = createRateLimiter({
 
 // POST /api/admin/auth/login - Authenticate
 adminAuthRouter.post("/login", loginLimiter, login);
+
+// POST /api/admin/auth/logout - Clear session cookie
+adminAuthRouter.post("/logout", logout);
 
 // GET /api/admin/auth/check - Session check (cookie or Authorization: Bearer)
 adminAuthRouter.get("/check", check);

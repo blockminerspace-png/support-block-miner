@@ -18,6 +18,7 @@ import {
     X
 } from 'lucide-react';
 import { useAdminCtx } from './AdminLayout';
+import { api } from '../store/auth';
 
 // minLevel: nivel MINIMO para ver o item (0 = só superadmin, 1 = full, 2 = todos)
 const adminMenuItems = [
@@ -29,7 +30,7 @@ const adminMenuItems = [
   { icon: Megaphone, label: 'Banners', path: '/admin/banners', minLevel: 2 },
   { icon: Youtube, label: 'Criadores', path: '/admin/creators', minLevel: 2 },
   { icon: Ticket, label: 'Dep. Tickets', path: '/admin/deposit-tickets', minLevel: 2 },
-  { icon: Bell, label: 'Notificacoes', path: '/admin/broadcast', minLevel: 2 },
+  { icon: Bell, label: 'Notificações', path: '/admin/broadcast', minLevel: 2 },
   { icon: Eye, label: 'Transparência', path: '/admin/transparency', minLevel: 2 },
   { icon: Activity, label: 'Métricas', path: '/admin/metrics', minLevel: 2 },
   { icon: TrendingUp, label: 'Analytics', path: '/admin/analytics', minLevel: 2 },
@@ -43,7 +44,9 @@ export default function AdminSidebar({ onClose }) {
 
   const visibleItems = adminLevel === null ? [] : adminMenuItems.filter(item => adminLevel <= item.minLevel);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try { await api.post('/admin/auth/logout'); } catch { /* ignora erro de rede */ }
+    localStorage.removeItem('adminToken');
     navigate('/admin/login');
   };
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ShieldAlert, Lock, Mail, Loader2, ChevronRight, AlertCircle } from 'lucide-react';
 import { api } from '../store/auth';
 
@@ -134,9 +134,9 @@ export default function AdminLogin() {
                 </div>
 
                 <div className="mt-8 text-center">
-                    <Link to="/login" className="text-slate-600 hover:text-slate-400 text-xs font-bold uppercase tracking-[0.2em] transition-colors">
-                        Voltar para Área do Usuário
-                    </Link>
+                    <a href="https://blockminer.space" className="text-slate-600 hover:text-slate-400 text-xs font-bold uppercase tracking-[0.2em] transition-colors">
+                        Voltar para BlockMiner
+                    </a>
                 </div>
             </div>
         </div>
