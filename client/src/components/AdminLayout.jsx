@@ -57,14 +57,13 @@ export default function AdminLayout() {
                 />
             )}
 
-            {/* Sidebar */}
-            <div className={`
-                fixed lg:static inset-y-0 left-0 z-40
-                transform transition-transform duration-300 ease-in-out
-                ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                lg:translate-x-0 lg:flex
-                shrink-0
-            `}>
+            {/* Sidebar desktop — sempre visível em lg+ */}
+            <div className="hidden lg:flex shrink-0">
+                <AdminSidebar onClose={() => setSidebarOpen(false)} />
+            </div>
+
+            {/* Sidebar mobile — drawer overlay */}
+            <div className={`fixed inset-y-0 left-0 z-40 lg:hidden transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <AdminSidebar onClose={() => setSidebarOpen(false)} />
             </div>
 
